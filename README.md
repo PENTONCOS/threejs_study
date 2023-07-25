@@ -1,5 +1,5 @@
 # three.js_study
-three.js学习笔记
+实现的一些 demo
 
 [多啦A梦时光机](./time-machine)
 
