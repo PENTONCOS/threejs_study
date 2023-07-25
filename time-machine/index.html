@@ -13,91 +13,147 @@
 </head>
 <body>
 <script>
-	// 创建场景 scene 和 renderer
-	const width = window.innerWidth;
-	const height = window.innerHeight;
-	
-	const scene = new THREE.Scene();
-	const renderer = new THREE.WebGLRenderer();
-	// 创建相机
-	const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+  // 创建场景 scene 和 renderer
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
-	renderer.setSize(width, height);
-	camera.position.set(0, 0, 500);
-	camera.lookAt(scene.position);
+  // 所有三维场景中的东西都加到 scene 里来管理。
+  const scene = new THREE.Scene(); 
+  // 场景中的所有物体，会由渲染器 WebGLRenderer 渲染出来。
+  const renderer = new THREE.WebGLRenderer(); 
+  
+  // 设置渲染器的尺寸
+  renderer.setSize(width, height);
+  // 将渲染器添加到页面中
+  document.body.appendChild(renderer.domElement);
 
-	// 光源
-	const pointLight = new THREE.PointLight( 0xffffff );
-	pointLight.position.set(0, 0, 500);
-	scene.add(pointLight);
+  // 创建相机
+  // 第一个参数：朝向角度；第二个参数：视口宽高比；第三个参数：指定视椎体的近距离；第四个参数：指定视椎体的远距离
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);  
+  // 相机位置
+  camera.position.set(0, 0 , 500); 
+  // 相机朝向
+  camera.lookAt(scene.position); 
 
-	document.body.appendChild(renderer.domElement)
+  // 没有明暗变化需要添加光源
+  const pointLight = new THREE.PointLight( 0xffffff );
+  // 光源位置
+  pointLight.position.set(0, 0, 500);
+  // 将光源添加到场景中
+  scene.add(pointLight);
 
-	let tunnel;
-	let stormTexture;
-	function create() {
-		// 处理贴图
-		const textureLoader = new THREE.TextureLoader();
-		textureLoader.load('storm.jpg', function(texture) {
-			stormTexture = texture;
+  // 创建可见物体
+  // function create (){
+  //   // 创建一个立方体 BoxGeometry
+  //   const geometry = new THREE.BoxGeometry( 100, 100, 100 );
+  //   // 指定材质 
+  //   // const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } ); // MeshBasicMaterial 不受光照的影响
 
-			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-			texture.repeat.set( 1, 2 );
+  //   // MeshPhongMaterial 模拟具有镜面高光的光泽表面
+  //   const material = new THREE.MeshPhongMaterial( {color: 0x00ff00})
+  //   // 将材质和新建的立方体关联
+  //   const cube = new THREE.Mesh( geometry, material );
 
-			// 创建圆柱体
-			const geometry = new THREE.CylinderGeometry( 30, 50, 1000, 32, 32, true);
+  //   // 绕 y 和 x 轴旋转 0.5 弧度
+  //   cube.rotation.x = 0.5;
+  //   cube.rotation.y = 0.5;
 
-			// MeshPhongMaterial 的材质，这种材质有金属质感，会反光
-			const material = new THREE.MeshPhongMaterial({ 
-				transparent: true,
-				alphaMap: texture,
-				side: THREE.BackSide
-			});
-			tunnel = new THREE.Mesh(geometry, material);
+  //   // 把立方体添加到场景中
+  //   scene.add( cube );
+  // }
 
-			tunnel.rotation.x = -Math.PI / 2;
+  // 创建圆柱体的隧道
+  let tunnel;
+  let cube;
+  let stormTexture;
+  function create (){
+    // 创建纹理加载器
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load('./storm.jpg', (texture) => {
+      stormTexture = texture;
+      // 设置水平和垂直方向重复
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      // 纹理在表面重复的次数
+      texture.repeat.set(1, 2);
 
-			scene.add(tunnel);
-		});
+    // 创建一个圆柱体 隧道
+    // 上圆半径 30、下圆半径 50，高 100，分 32 段
+    const geometry = new THREE.CylinderGeometry( 30, 50, 1000, 32, 32, true);
+    // 指定材质
+    const meterial = new THREE.MeshPhongMaterial({
+      // 把这个 texture 设置为纹理 如果需要变色，最好不要直接贴图
+      // map: texture, 
+      side: THREE.DoubleSide,
+      // 让贴图作为透明通道
+      transparent: true,
+      alphaMap: texture
+    });
+    // 将材质和新建的圆柱体关联
+    tunnel = new THREE.Mesh(geometry, meterial);
+    // 让隧道绕 x 轴旋转 90 度
+    tunnel.rotation.x =  -Math.PI / 2;
+    // 把圆柱体添加到场景中
+    scene.add(tunnel);
+    })
 
-		// 时光机的底座 立方体
+    // 创建一个立方体 时光机的底座
 		textureLoader.load('metal.png', function(texture) {
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 			texture.repeat.set( 10, 10 );
 
 			const geometry = new THREE.BoxGeometry( 30, 2, 30 ); 
 
-			const material = new THREE.MeshPhongMaterial( {
-				map: texture
-			});
+			const material = new THREE.MeshPhongMaterial( {map: texture});
 
-			const cube = new THREE.Mesh( geometry, material ); 
+			cube = new THREE.Mesh( geometry, material ); 
 			cube.position.z = 460;
 			cube.position.y = -20;
 			scene.add( cube );
 		});	
-	}
+  }
 
-	let H = 0;
-	// 设置不同的颜色
-	function render() {
-		renderer.render(scene, camera);
 
-		H += 0.002;
-		if (H > 1) { H = 0; }
+  let H = 0;
+  let stepPositionZ = -0.1;
+  let stepRotationZ = -0.001;
+  let stepRotationX = -0.0001;
 
-		if(tunnel) {
-			tunnel.material.color.setHSL(H, 0.5, 0.5);
+  // 渲染一帧
+  function render (){
+    renderer.render(scene, camera);
 
-			tunnel.rotation.y += 0.01;
-			stormTexture.offset.y += 0.01;
-		}
-		requestAnimationFrame(render);
-	}
+    H += 0.01;
 
-	create();
-	render();
+    if(H > 1){ H = 0; }
 
+    if(tunnel && cube){
+      // 设置不同的颜色
+      tunnel.material.color.setHSL(H, 0.5, 0.5);
+      // 隧道在 y 方向转动
+      tunnel.rotation.y += 0.01;
+      // 让隧道的纹理也动起来
+      stormTexture.offset.y += 0.01;
+
+      if(cube.position.z < 390 || cube.position.z > 460){
+        stepPositionZ = -stepPositionZ;
+      }
+      if(Math.abs(cube.rotation.z) > 0.15){
+        stepRotationZ = -stepRotationZ;
+      }
+      if(Math.abs(cube.rotation.z) > 0.01){
+        stepRotationX = -stepRotationX;
+      }
+
+      cube.position.z += stepPositionZ;
+      cube.rotation.z += stepRotationZ;
+      cube.rotation.x += stepRotationX;
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  create();
+  render();
 </script>
 </body>
 </html>
