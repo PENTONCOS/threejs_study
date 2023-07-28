@@ -76,24 +76,24 @@
       // 纹理在表面重复的次数
       texture.repeat.set(1, 2);
 
-    // 创建一个圆柱体 隧道
-    // 上圆半径 30、下圆半径 50，高 100，分 32 段
-    const geometry = new THREE.CylinderGeometry( 30, 50, 1000, 32, 32, true);
-    // 指定材质
-    const meterial = new THREE.MeshPhongMaterial({
-      // 把这个 texture 设置为纹理 如果需要变色，最好不要直接贴图
-      // map: texture, 
-      side: THREE.DoubleSide,
-      // 让贴图作为透明通道
-      transparent: true,
-      alphaMap: texture
-    });
-    // 将材质和新建的圆柱体关联
-    tunnel = new THREE.Mesh(geometry, meterial);
-    // 让隧道绕 x 轴旋转 90 度
-    tunnel.rotation.x =  -Math.PI / 2;
-    // 把圆柱体添加到场景中
-    scene.add(tunnel);
+      // 创建一个圆柱体 隧道
+      // 上圆半径 30、下圆半径 50，高 100，分 32 段
+      const geometry = new THREE.CylinderGeometry( 30, 50, 1000, 32, 32, true);
+      // 指定材质
+      const meterial = new THREE.MeshPhongMaterial({
+        // 把这个 texture 设置为纹理 如果需要变色，最好不要直接贴图
+        // map: texture, 
+        side: THREE.DoubleSide,
+        // 让贴图作为透明通道
+        transparent: true,
+        alphaMap: texture
+      });
+      // 将材质和新建的圆柱体关联
+      tunnel = new THREE.Mesh(geometry, meterial);
+      // 让隧道绕 x 轴旋转 90 度
+      tunnel.rotation.x =  -Math.PI / 2;
+      // 把圆柱体添加到场景中
+      scene.add(tunnel);
     })
 
     // 创建一个立方体 时光机的底座
