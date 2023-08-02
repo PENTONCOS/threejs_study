@@ -3,6 +3,7 @@
 
 - [多啦A梦时光机](./time-machine)
 - [360全景浏览](./panoramic-browsing)
+- [房子](./house)
 
 
 # 运行
