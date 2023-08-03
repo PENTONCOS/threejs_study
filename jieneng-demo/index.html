@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>jieneng-demo</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            touch-action: none;
+        }
+    </style>
+    <script src="./js/three.js"></script>
+    <script src="./js/GLTFLoader.js"></script>
+    <!-- <script src="./js/FBXLoader.js"></script> -->
+    <script src="./js/fflate.js"></script>
+    <script src="./js/OrbitControls.js"></script>
+</head>
+
+<body>
+    <script>
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000000);
+
+        const scene = new THREE.Scene();
+
+        const renderer = new THREE.WebGLRenderer();
+
+        function create() {
+            renderer.setSize(width, height);
+            renderer.setClearColor(0xcce0ff, 1);
+            document.body.appendChild(renderer.domElement);
+
+            camera.position.set(20, 20, 20)
+            camera.lookAt(scene.position);
+
+            var light = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
+            scene.add(light);
+
+            // const light = new THREE.AmbientLight(0xCCCCCC);
+            // scene.add(light);
+
+            // const pointLight = new THREE.PointLight( 0xffffff);
+            // pointLight.position.set( 20, 20, 20 );
+            // scene.add( pointLight );
+
+            // const sphereSize = 500;
+            // const pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
+            // scene.add( pointLightHelper );
+
+            // const axisHelper = new THREE.AxisHelper(2000);
+            // scene.add(axisHelper);
+        }
+
+        var raycaster = new THREE.Raycaster();
+        var mouse = new THREE.Vector2();
+
+        function onMouseClick(event) {
+            // 计算鼠标点击位置的归一化设备坐标
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // 调用射线投射方法，检查是否与模型相交
+            raycaster.setFromCamera(mouse, camera);
+
+            // 获取与射线相交的所有对象
+            var intersects = raycaster.intersectObjects(scene.children, true);
+
+            if (intersects.length > 0) {
+                // 可以根据需要处理相交的对象，例如：在控制台打印被点击的对象
+                console.log('Clicked on object:', intersects[0].object);
+            }
+        }
+
+        window.addEventListener('click', onMouseClick, false);
+
+
+        function createScence() {
+            var loader = new THREE.GLTFLoader();
+            loader.load('./obj/场景集合.glb', function (gltf) {
+                var model = gltf.scene;
+                scene.add(model);
+            });
+        }
+
+        function render() {
+            renderer.render(scene, camera);
+            requestAnimationFrame(render)
+        }
+
+        create()
+        render()
+        createScence()
+
+        const controls = new THREE.OrbitControls(camera);
+
+    </script>
+</body>
+
+</html>
