@@ -65,8 +65,10 @@
             // 调用射线投射方法，检查是否与模型相交
             raycaster.setFromCamera(mouse, camera);
 
+
+            console.log('scene.children',scene.children)
             // 获取与射线相交的所有对象
-            var intersects = raycaster.intersectObjects(scene.children, true);
+            var intersects = raycaster.intersectObjects(scene.children[1].children, true);
 
             if (intersects.length > 0) {
                 // 可以根据需要处理相交的对象，例如：在控制台打印被点击的对象
